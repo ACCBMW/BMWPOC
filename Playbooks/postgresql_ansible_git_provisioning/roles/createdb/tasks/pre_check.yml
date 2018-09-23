@@ -1,0 +1,179 @@
+- name: Getting the Version
+  shell: echo {{version}} | tr -d . 
+  register: check_version
+
+
+############### CHECK DATABASE INSTALLATION ##################
+- name: Database Already Existing?
+  shell: rpm -qa | grep -i postgresql
+  register: db_check
+  ignore_errors: true
+
+- debug:
+    msg: Database already exists on the server
+  when: db_check.rc == 0
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    body: "System {{ ansible_hostname }},Database already exists on the server"
+  delegate_to: localhost
+  when: db_check.rc == 0
+
+- meta: end_play
+  when: db_check.rc == 0
+
+
+  
+
+
+############### SELINUX CHECK #######################
+
+- stat: path=/etc/selinux/config
+  register: selinux_file
+
+- name: Checking SElinux status
+  shell: cat /etc/selinux/config | grep -w ^SELINUX | awk -F "=" '{print$2}'
+  when: selinux_file.stat.exists
+  register: selinux_status
+
+- debug:
+       msg: Current SElinux policy is = {{selinux_status.stdout}}
+  when: selinux_file.stat.exists
+
+- debug:
+     msg : "Stopping installation,Please change SElinux policy to 'permissive' before installation."
+  when: selinux_file.stat.exists and selinux_status.stdout is defined and selinux_status.stdout != 'permissive' 
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    body: System {{ ansible_hostname }} has SELINUX not in permissive mode.
+  delegate_to: localhost
+  when: selinux_file.stat.exists and selinux_status.stdout is defined and selinux_status.stdout != 'permissive'
+
+- meta: end_play
+  when: selinux_file.stat.exists and selinux_status.stdout is defined and selinux_status.stdout != 'permissive'
+
+######################### Check OS Compatibility ##################
+
+- name: Checking OS Compatibility
+  shell:  cat /etc/os-release | grep PRETTY_NAME | awk '{print $5}'
+  register: os_version
+
+- debug:
+       msg: Current SLES OS version is = SLES {{os_version.stdout}}
+
+- debug:
+       msg: "Stopping installation,Postgres version 9.2,9.3,9.4 requires SLES 11 and 9.5 above requires SLES 12"
+  when: (os_version.stdout|int < 12 and check_version.stdout|int >= 95) or (os_version.stdout|int > 11 and check_version.stdout|int <= 94)
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    body: System {{ ansible_hostname }}, Stopping installation,Postgres version 9.2,9.3,9.4 requires SLES 11 and 9.5 above requires SLES 12.
+  delegate_to: localhost
+  when: (os_version.stdout|int < 12 and check_version.stdout|int >= 95) or (os_version.stdout|int > 11 and check_version.stdout|int <= 94)
+
+- meta: end_play
+  when: (os_version.stdout|int < 12 and check_version.stdout|int >= 95) or (os_version.stdout|int > 11 and check_version.stdout|int <= 94)
+
+
+
+###################### Disk space check ##############################
+
+- name: Checking Disk Space
+  shell:  df -kh | grep -w "/" | awk  '{print$4}' | tr -d G
+  register: disk_space
+
+- debug:
+       msg: Current available Disk Space in / =  {{disk_space.stdout}}G
+
+- debug:
+       msg: "Stopping installation,Postgres requires minimum of 1 GB of free disk space"
+  when:  disk_space.stdout|int < 1  
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    body: System {{ ansible_hostname }}, Stopping installation,Postgres requires minimum of 1 GB of free disk space.
+  delegate_to: localhost
+  when:  disk_space.stdout|int < 1
+
+- meta: end_play
+  when:  disk_space.stdout|int < 1
+
+
+
+######################## Memory Check ########################
+
+
+- name: Checking Memory 
+  shell:  free -m | grep -i "Mem:" | awk '{print $2}' | tr -d m
+  register: memory_space
+
+- debug:
+       msg: Current RAM is = {{memory_space.stdout}} M
+
+- debug:
+     msg : "Ram size is less then 1 GB,Plese increase it to continue with installation"
+  when: memory_space.stdout|int < 900
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    body: System {{ ansible_hostname }}, Ram size is less then 1 GB,Plese increase it to continue with installation.
+  delegate_to: localhost
+  when: memory_space.stdout|int < 900
+
+- meta: end_play
+  when: memory_space.stdout|int < 900
+
+################################### CPU Check ############################
+
+
+- name: Checking CPU
+  shell:  top -b -n1 -p 1  | grep "Cpu(s)" | awk -F "," '{print$4}' | tr -d id| tr -d " \t\r"
+  register: cpu_usage
+
+- debug:
+       msg: Current CPU idle % is = {{cpu_usage.stdout}} 
+
+- debug:
+     msg : "Stopping installation,CPU utilization is greater then 90 %"
+  when: cpu_usage.stdout|int < 10
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    body: System {{ ansible_hostname }}, Stopping installation,CPU utilization is greater then 90%.
+  delegate_to: localhost
+  when: cpu_usage.stdout|int < 10
+
+- meta: end_play
+  when: cpu_usage.stdout|int < 10
+
