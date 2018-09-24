@@ -1,0 +1,10 @@
+- name: Create a PostgreSQL DB server
+  serial: 50
+  hosts: all
+  become: yes
+  vars:
+#    version: "{{postgresql_version}}"
+  vars_files:
+    - vars/main.yml
+  roles:
+  - createdb

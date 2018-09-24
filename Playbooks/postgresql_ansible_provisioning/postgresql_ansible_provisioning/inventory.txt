@@ -1,5 +1,6 @@
 [targets]
-34.228.52.150
+#18.207.224.10
+35.172.165.231
 [targets:vars]
 ansible_user=ansible
 #ansible_ssh_private_key_file=/root/.ssh/id_rsa

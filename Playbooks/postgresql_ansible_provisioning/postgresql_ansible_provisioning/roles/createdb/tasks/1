@@ -1,0 +1,70 @@
+################# Service status #######################3
+
+- name: Checking Service
+  shell:  service postgresql status | grep -w running | grep -w running | awk '{print$3}' | tr -d "()" warn=no
+  register: service_status
+  when: ansible_distribution == 'SLES'
+
+- debug:
+       msg: "Post Check failed,Postgres service is not running"
+  when:  service_status.stdout != 'running'
+  when: ansible_distribution == 'SLES'  
+#- meta: end_play
+#  when:  service_status.stdout != 'running'
+
+
+################## Port Status ##########################
+
+- name: Checking Port Status
+  shell:  netstat -nap | grep -w LISTEN | grep 5432 | tail -1 | awk -F ":" '{print$4}'
+  register: port_status
+
+- debug:
+       msg: "Post Check failed,Postgres service is not Listening on port 5432"
+  when: port_status.stdout|int != 5432
+
+#- meta: end_play
+#  when: port_status.stdout|int != 5432
+
+########################### Log Status ######################################
+
+- name: Checking Log status
+  shell: find / -iname pg_log
+  register: log_file_dir
+
+- name: Checking Latest file
+  shell: ls -lrth "{{log_file_dir.stdout}}" | tail -1 | awk '{print$9}'
+  register: log_file
+
+- name: Checking for error
+  shell: cat "{{log_file_dir.stdout}}"/"{{log_file.stdout}}" | grep -i error;rc=0
+  register: error_found
+
+- debug:
+       msg: Found error in postgres log - "{{error_found.stdout}}"
+  when: error_found.stdout != ""
+
+################################ Health Check report ###################
+
+- name: Running Health Check report
+  copy: src=/home/ansible/postgresql_ansible_provisioning/PostgreSQL_Healthreport_script.sh  dest=/tmp mode=0777
+
+- name: Execute the script
+  command: sh /tmp/PostgreSQL_Healthreport_script.sh
+
+- fetch:
+    src: "/root/health_reports/PostgreSQL-Health-Report.html"
+    dest: "/tmp/{{ ansible_hostname }}_PostgreSQL-Health-Report.html"
+    flat: yes
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: Ansible-report
+    attach:
+      - /tmp/{{ ansible_hostname }}_PostgreSQL-Health-Report.html
+    body: System {{ ansible_hostname }}, Post-Check Report After Installation.
+  delegate_to: localhost
