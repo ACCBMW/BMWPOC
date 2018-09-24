@@ -27,7 +27,7 @@
     - bash
     - openssl
   tags: packages
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Install PostgreSQL
   zypper: name={{ item }} update_cache={{ update_apt_cache }} state=installed
@@ -48,13 +48,11 @@
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
 - name: Install PostgreSQL
-  apt: name={{ item }} update_cache={{ update_apt_cache }} state=installed
+  yum: name={{ item }} update_cache={{ update_apt_cache }} state=installed
   with_items:
-    - postgresql{{check_version.stdout}}
-    - postgresql{{check_version.stdout}}-contrib
-    - postgresql{{check_version.stdout}}-server
+    - postgresql*
   tags: packages
-  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'
 
 - name: Ensure the PostgreSQL service is running
   service: name=postgresql state=started enabled=yes

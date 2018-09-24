@@ -3,11 +3,13 @@
 - name: Checking Service
   shell:  service postgresql status | grep -w running | grep -w running | awk '{print$3}' | tr -d "()" warn=no
   register: service_status
+  when: ansible_distribution == 'SLES'
 
 - debug:
        msg: "Post Check failed,Postgres service is not running"
   when:  service_status.stdout != 'running'
-  
+  when: ansible_distribution == 'SLES'  
+
 #- meta: end_play
 #  when:  service_status.stdout != 'running'
 
@@ -52,8 +54,8 @@
   command: sh /tmp/PostgreSQL_Healthreport_script.sh
 
 - fetch:
-    src: "/root/health_reports/PostgreSQL-Health-Report.html"
-    dest: "/tmp/{{ ansible_hostname }}_PostgreSQL-Health-Report.html"
+    src: "/root/health_reports/PostgreSQL-Deployment-Report.html"
+    dest: "/tmp/{{ ansible_hostname }}_PostgreSQL-Deployment-Report.html"
     flat: yes
 
 - mail:
@@ -64,6 +66,6 @@
     to: simranjeet.g.singh@accenture.com
     subject: Ansible-report
     attach:
-      - /tmp/{{ ansible_hostname }}_PostgreSQL-Health-Report.html
+      - /tmp/{{ ansible_hostname }}_PostgreSQL-Deployment-Report.html
     body: System {{ ansible_hostname }}, Post-Check Report After Installation.
   delegate_to: localhost

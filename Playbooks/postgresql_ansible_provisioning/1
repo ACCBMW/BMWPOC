@@ -45,7 +45,7 @@ then
 fi
 #find ${HOME}/health_reports/ -mtime +1 -exec rm {} \;
 find ${HOME}/health_reports/ -exec rm {} \;
-html="${HOME}/health_reports/PostgreSQL-Health-Report.html"
+html="${HOME}/health_reports/PostgreSQL-Deployment-Report.html"
 #email_add="raj.kce2912@gmail.com"
 for i in `ls /home`; do sudo du -sh /home/$i/* | sort -nr | grep G; done > /tmp/dir.txt
 #Generating HTML file
