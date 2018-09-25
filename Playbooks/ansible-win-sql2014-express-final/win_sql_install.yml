@@ -1,0 +1,7 @@
+- name: Create a MSSQL DB server
+  hosts: all
+  vars_files:
+    - vars/main.yml
+
+  roles:
+  - install

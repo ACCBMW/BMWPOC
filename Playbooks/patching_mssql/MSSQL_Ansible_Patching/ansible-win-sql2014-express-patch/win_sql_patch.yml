@@ -1,0 +1,49 @@
+- hosts: all
+  gather_facts: True
+  vars:
+   sql_instance_name: benz
+  tasks:
+   - debug: var=hostvars[inventory_hostname]
+   - name: create a directory for installer download
+     win_file: 
+        path: c:\sql
+        state: directory
+   
+   - name: create a directory for patch installer extraction
+     win_file: 
+        path: c:\sql\hotfix
+        state: directory
+
+   - name: create the configuration file
+     win_template: 
+       src: files/sql_conf.ini.j2_working
+       dest: c:\sql\sql_conf.ini
+
+   - name: a pre requisite of sql net-framework-35
+     win_feature:
+        name: NET-Framework-Core
+        state: present
+
+   - name: check downloaded file exists
+     win_stat:
+        path: c:\sql\hotfix\sql_patch.exe
+     register: hotfix_file
+
+   - name: get the installer
+     win_get_url:
+          url: 'http://download.microsoft.com/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe'
+          dest: 'c:\sql\hotfix\sql_patch.exe'
+     when: not hotfix_file.stat.exists
+   
+   - name: Install the patch
+     win_command: c:\sql\installer\setup.exe /action=install /configurationfile=c:\sql\sql_conf.ini /updatesource=c:\sql\hotfix
+     args:
+      chdir: c:\sql
+      
+   - name: Restart a service
+     win_service:
+       name: 'MSSQL${{ sql_instance_name }}'
+       force_dependent_services: yes
+       state: restarted
+     when: win_reg.changed
+      

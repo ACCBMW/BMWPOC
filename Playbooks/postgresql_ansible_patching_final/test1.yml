@@ -1,0 +1,6 @@
+- name: test of postgresql backup
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: postgresql backup
+    shell: sudo su -c "pg_dumpall -p5432 -U postgres > /tmp/alldbs.pgsql" postgres

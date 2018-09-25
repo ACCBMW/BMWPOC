@@ -1,0 +1,3 @@
+---
+# vars file for win_mssql_patch
+sql_instance_name: MSSQLBMW

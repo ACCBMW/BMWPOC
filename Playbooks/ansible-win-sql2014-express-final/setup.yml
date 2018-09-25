@@ -1,0 +1,21 @@
+- name: setup details
+  hosts: all
+  vars:
+    sql_instance_name: test_demo
+  tasks:
+  - name: getting the details
+    setup:
+      filter: ansible_default_ipv4.address
+    register: p
+  - name: getting the available disk space details
+    win_disk_facts:
+    register: disk
+  - name: getting the available service details
+    win_service:
+      name: "{{ 'SQL Server ('+ sql_instance_name + ')' }}"
+    register: services
+  - name: Include task list in play only if the condition is true
+    include: install.yml
+    when: p.ansible_facts.ansible_processor_count|int >= 1 and p.ansible_facts.ansible_memtotal_mb|int >= 1024 and p.ansible_facts.ansible_distribution == "Microsoft Windows Server 2016 Datacenter" and disk.ansible_facts.ansible_disks[0].partitions[0].volumes[0].size_remaining|int >= 6442450944 and not services.exists
+  - debug:
+      msg: "{{ services }}"

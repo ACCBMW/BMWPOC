@@ -1,0 +1,99 @@
+- name: create a directory for installer download
+  win_file:
+     path: c:\sql
+     state: directory
+
+- name: create a directory for installer extraction
+  win_file:
+     path: c:\sql\installer
+     state: directory
+
+- name: create the configuration file
+  win_template:
+    src: files/sql_conf.ini.j2_working
+    dest: c:\sql\sql_conf.ini
+
+- name: a pre requisite of sql net-framework-35
+  win_feature:
+     name: NET-Framework-Core
+     state: present
+
+- name: check downloaded file exists
+  win_stat:
+     path: c:\sql\sql_installer.exe
+  register: installer_file
+
+- name: get the installer
+  win_get_url:
+       url: 'http://download.microsoft.com/download/E/A/E/EAE6F7FC-767A-4038-A954-49B8B05D04EB/ExpressAndTools%2064BIT/SQLEXPRWT_x64_ENU.exe'
+       dest: 'c:\sql\sql_installer.exe'
+  when: not installer_file.stat.exists
+
+- name: extract the installer
+  win_command: c:\sql\sql_installer.exe /q /x:c:\sql\installer
+  args:
+   chdir: c:\sql
+   creates: c:\sql\installer\setup.exe
+
+- name: Install the database
+  win_command: c:\sql\installer\setup.exe /configurationfile=c:\sql\sql_conf.ini
+  args:
+   chdir: c:\sql
+  register: install_output
+  ignore_errors: True
+
+- name: Mail Notification
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: simranjeet.g.singh@accenture.com
+    subject: MSSQL Installation {{ ansible_hostname }}
+    body: "System {{ ansible_hostname }},Database not installed, Invalid Database Server Instance Name"
+  delegate_to: localhost
+  when: "'non-zero' in install_output.msg"
+
+- meta: end_play
+  when: "'non-zero' in install_output.msg"
+
+- name: Add or update registry for ip port
+  win_regedit:
+    path: 'HKLM:\Software\Microsoft\Microsoft SQL Server\MSSQL12.{{ sql_instance_name }}\MSSQLServer\SuperSocketNetLib\Tcp\IPAll'
+    name: TcpPort
+    data: 1433
+  register: win_reg
+
+- name: Restart a service
+  win_service:
+    name: 'MSSQL${{ sql_instance_name }}'
+    force_dependent_services: yes
+    state: restarted
+  when: win_reg.changed
+
+- name: copy the powershell script
+  win_copy:
+    src: /home/ansible/mssql/ansible-win-sql2014-express/SQLserverHC.ps1
+    dest: C:\sql\SQLserverHC.ps1
+    force: yes
+
+- name: powershell script execution
+  win_command: powershell.exe C:\sql\SQLserverHC.ps1
+
+- name: fetching the html file
+  fetch: src=C:\sql\SQLHealthReport.htm dest=/home/ansible/mssql/ansible-win-sql2014-express/SQLHealthReport.html flat=yes
+
+- name: Send e-mail to a bunch of users, attaching files
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    secure: starttls
+    charset: utf-8
+    sender: raj.a.gopalachari@accenture.com
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: 'raj.a.gopalachari@accenture.com'
+    subject: MSSQL Report
+    attach:
+    - /home/ansible/mssql/ansible-win-sql2014-express/SQLHealthReport.html
+  delegate_to: localhost
