@@ -1,9 +1,0 @@
-[win]
-18.207.255.152
-
-[win:vars]
-ansible_connection=winrm
-ansible_winrm_cert_pem=/home/ansible/certi/cert.pem
-ansible_winrm_cert_key_pem=/home/ansible/certi/cert_key.pem
-ansible_winrm_transport=certificate
-ansible_winrm_server_cert_validation=ignore

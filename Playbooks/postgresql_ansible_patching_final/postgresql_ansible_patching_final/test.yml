@@ -1,5 +1,0 @@
-- name: test
-  hosts: all
-  tasks:
-   - name : postgressql backup
-     command: sudo su -c "pg_dumpall -p5432 -U postgres > /tmp/alldbs.pgsql" postgres

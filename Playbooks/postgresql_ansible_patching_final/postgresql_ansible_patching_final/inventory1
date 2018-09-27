@@ -1,6 +1,0 @@
-[targets]
-localhost
-
-[targets:vars]
-ansible_connection=local
-

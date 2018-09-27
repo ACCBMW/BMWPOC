@@ -1,8 +1,0 @@
-[win]
-35.153.143.21
-
-[win:vars]
-ansible_user=administrator
-ansible_password=Accenture@1234
-ansible_connection=winrm
-ansible_winrm_server_cert_validation=ignore

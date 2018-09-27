@@ -1,4 +1,0 @@
-- name: MS-SQL patching
-  hosts: all
-  roles:
-    - win_mssql_patch 
