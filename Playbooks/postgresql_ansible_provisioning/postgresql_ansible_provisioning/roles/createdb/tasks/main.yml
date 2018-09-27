@@ -5,13 +5,13 @@
 #- name: print version
 #  shell: echo {{check_version.stdout}} > /tmp/test
 
-- name: Ensure bash, OpenSSl, and libssl are the latest versions
-  zypper: name={{ item }} update_cache={{ update_apt_cache }} state=latest
-  with_items:
-    - bash
-    - openssl
-  tags: packages
-  when: ansible_distribution == 'SLES'
+#- name: Ensure bash, OpenSSl, and libssl are the latest versions
+#  zypper: name={{ item }} update_cache={{ update_apt_cache }} state=latest
+#  with_items:
+#    - bash
+#   - openssl
+#  tags: packages
+#  when: ansible_distribution == 'SLES'
 
 - name: Ensure bash, OpenSSl, and libssl are the latest versions
   apt: name={{ item }} update_cache={{ update_apt_cache }} state=latest
@@ -32,9 +32,20 @@
 - name: Install PostgreSQL
   zypper: name={{ item }} update_cache={{ update_apt_cache }} state=installed
   with_items:
-    - postgresql{{check_version.stdout}}
-    - postgresql{{check_version.stdout}}-contrib
-    - postgresql{{check_version.stdout}}-server
+    - "{{ version }}"
+  tags: packages
+  when: ansible_distribution == 'SLES'
+
+- name: contrib
+  set_fact:
+    contribpack: "{{ version | regex_replace('server','contrib')}}"
+  
+- name: Install PostgreSQL
+  zypper: name={{ item }} update_cache={{ update_apt_cache }} state=installed
+  with_items:
+#    - postgresql{{check_version.stdout}}
+    - "{{ contribpack }}"
+#    - postgresql{{check_version.stdout}}-server
   tags: packages
   when: ansible_distribution == 'SLES'
 

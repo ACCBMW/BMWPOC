@@ -70,3 +70,7 @@
 
 - name: Post-checks
   import_tasks: post_check.yml
+
+#- name: postgresql db creation
+#  postgresql_db:
+#    name: mynewdb

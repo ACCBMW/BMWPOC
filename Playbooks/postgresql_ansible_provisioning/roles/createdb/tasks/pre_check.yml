@@ -83,7 +83,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Ansible-report
     body: System {{ ansible_hostname }}, Stopping installation,Postgres version 9.2,9.3,9.4 requires SLES 11 and 9.5 above requires SLES 12.
   delegate_to: localhost
@@ -113,7 +113,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Ansible-report
     body: System {{ ansible_hostname }}, Stopping installation,Postgres version 9.2,9.3,9.4 requires SLES 11 and 9.5 above requires SLES 12.
   delegate_to: localhost
@@ -139,7 +139,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Ansible-report
     body: System {{ ansible_hostname }}, Stopping installation,Postgres requires minimum of 1 GB of free disk space.
   delegate_to: localhost
@@ -169,7 +169,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Ansible-report
     body: System {{ ansible_hostname }}, Ram size is less then 1 GB,Plese increase it to continue with installation.
   delegate_to: localhost
@@ -197,7 +197,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Ansible-report
     body: System {{ ansible_hostname }}, Stopping installation,CPU utilization is greater then 90%.
   delegate_to: localhost

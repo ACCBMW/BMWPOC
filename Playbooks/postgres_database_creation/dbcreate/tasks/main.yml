@@ -1,0 +1,55 @@
+---
+# tasks file for dbcreate
+- pip: name=psycopg2
+- postgresql_user:
+    name: "{{ appuser }}"
+    password: "{{ apppassword }}"
+    state: present
+
+- name: CREATE POSTGRES DATABASE
+  postgresql_db:
+    name: "{{ dbname }}"
+    port: "{{ appport }}"
+    owner: "{{ appuser }}"
+    state: present
+  register: dbcreate
+
+- debug: msg="{{ dbcreate }}"
+
+- name: entry in pg_hba.conf
+  shell: echo "host    {{ dbname }}          {{ appuser }}         0.0.0.0/0                 md5" >> /var/lib/pgsql/data/pg_hba.conf
+  when: dbcreate.changed == true
+
+- name: entry for listener
+  shell: echo "listen_addresses = '*'" >> /var/lib/pgsql/data/postgresql.conf
+  when: dbcreate.changed == true
+
+- name: postgres service start
+  service:
+    name: postgresql
+    state: restarted
+  become_user: root
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: "{{ mailid }}"
+    subject: PostgreSQL DB Details
+    body: System {{ ansible_hostname }}, DB with DB name "{{ dbname }}" having owner "{{ appuser }}" has been created successfully. Password for owner "{{ appuser }}" will be shared by central security team.
+  delegate_to: localhost
+  when: dbcreate.changed == true
+
+- mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: "{{ mailid }}"
+    subject: PostgreSQL DB Details
+    body: System {{ ansible_hostname }}, DB with DB name "{{ dbname }}" already exists.
+  delegate_to: localhost
+  when: dbcreate.changed == false
+
+

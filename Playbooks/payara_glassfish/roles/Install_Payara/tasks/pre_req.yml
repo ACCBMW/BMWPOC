@@ -1,0 +1,20 @@
+- name: Checking Java
+  yum: name=java-1.8.0-openjdk state=installed
+  when: ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
+
+- name: Checking Java
+  shell: zypper -n install java-1_8_0-openjdk warn=no
+  when: ansible_distribution == "SLES" 
+
+- name: Checking file permission
+  shell: chmod 777 /software/binaries/Payara/payara-web-5.183.tar.gz warn=no
+
+- name: Create Group
+  group: name=payara state=present
+
+- name: Create User
+  user: name=payara groups=payara append=yes
+
+- name: Checking file permission
+  shell: chmod 777 /software/binaries/sample.war;chown payara:payara /software/binaries/sample.war  warn=no
+

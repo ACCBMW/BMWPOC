@@ -1,0 +1,38 @@
+- name: create web target group for apache instances
+  elb_target_group:
+    name: "{{ web_tgname }}"
+    protocol: "{{ web_protocol }}"
+    port: "{{ web_port }}"
+    vpc_id: "{{ vpc_id }}"
+    health_check_path: "{{ web_hcpath }}"
+    successful_response_codes: "200,250-260"
+    targets:
+    - Id: "{{ web_tg_id1 }}"
+      Port: "{{ web_tg_port }}"
+    - Id: "{{ web_tg_id2 }}"
+      Port: "{{ web_tg_port }}"
+    state: present
+
+- pause:
+    seconds: 30
+
+- name: create application load balancer
+  elb_application_lb:
+    name: "{{ elb_name }}"
+    security_groups:
+    - "{{ sg_alb }}"
+    subnets:
+    - "{{ sg_subnet1 }}"
+    - "{{ sg_subnet2 }}"
+    listeners:
+    - Protocol: HTTP
+      Port: 80
+      DefaultActions:
+      - Type: forward
+        TargetGroupName: "{{ web_tgname }}"
+#    wait: True
+    state: present
+
+- pause:
+    seconds: 60
+

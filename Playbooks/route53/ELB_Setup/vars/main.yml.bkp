@@ -1,0 +1,20 @@
+---
+# vars file for /etc/ansible/roles/Install_Payara
+ec2_access_key: AKIAI7JWFREV32P3PJ5A
+ec2_secret_key: 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
+tgname: tgport80
+protocol: TCP
+port: 80
+vpc_id: vpc-71ea1418
+hcpath: /var/www/html/index.html
+tg_id1: i-049ee9771d83e7966
+tg_port: 80
+tg_id2: i-047dd7925fec543e9
+tg_port: 80
+elb_name: bmwpocelb
+sg_alb: sg-0e5cc669ace99b9d2
+sg_subnet1: subnet-6b884602
+sg_subnet2: subnet-5fd9c127
+elb_zone_id: Z2ANGYXDEKJLAY
+zone_name: paasdemo.com
+elb_dns_name: 

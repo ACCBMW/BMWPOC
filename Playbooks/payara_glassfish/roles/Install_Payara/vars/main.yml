@@ -1,0 +1,5 @@
+---
+# vars file for /etc/ansible/roles/Install_Payara
+#payara_home: "{{payarahome}}"
+payara_home: /app
+mailid: simranjeet.g.singh@accenture.com

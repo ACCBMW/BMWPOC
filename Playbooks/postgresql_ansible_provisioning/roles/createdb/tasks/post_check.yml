@@ -63,7 +63,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Ansible-report
     attach:
       - /tmp/{{ ansible_hostname }}_PostgreSQL-Deployment-Report.html

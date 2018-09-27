@@ -1,0 +1,15 @@
+- file:
+    path: "{{payara_home}}"
+    state: directory
+    mode: 0755
+
+- name: copy binaries
+  shell: cd "{{payara_home}}";tar -xvzf /software/binaries/Payara/payara-web-5.183.tar.gz warn=no
+
+
+- file:
+   path: "{{payara_home}}/payara5"
+   owner: payara
+   group: payara
+   recurse: yes
+  

@@ -1,0 +1,6 @@
+- name: Install payara glassfish, apache and configure Application Load Balancer
+  hosts: localhost
+  connection: local
+  #gather_facts: False
+  roles:
+    - ELB_Setup

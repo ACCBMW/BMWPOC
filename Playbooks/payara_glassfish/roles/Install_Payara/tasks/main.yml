@@ -1,0 +1,23 @@
+---
+- name: Downloading required packages
+  import_tasks: download.yml
+
+- name: Check and install Pre-requisites
+  import_tasks: pre_req.yml
+
+- name: Download binaries
+  import_tasks: binary.yml
+
+- name: Starting domain
+  import_tasks: service.yml
+
+- name: Mail the URL
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: janpreet27july5@gmail.com
+    password: Globe@123
+    to: "{{ mailid }}"
+    subject: PostgreSQL DB Details
+    body: Glassfish Deployed on System {{ ansible_hostname }}, here is the URL "{{ inventory_hostname }}:8080/sample".
+  delegate_to: localhost

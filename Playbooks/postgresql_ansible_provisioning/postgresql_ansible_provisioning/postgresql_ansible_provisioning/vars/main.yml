@@ -1,0 +1,4 @@
+---
+update_apt_cache: true
+#version: "{{postgresql_version}}"
+version: 10

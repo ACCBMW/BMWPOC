@@ -1,0 +1,10 @@
+- file:
+    path: /software/binaries
+    state: directory
+    mode: 0755
+
+- name: Downloading file from git
+  git:
+    repo: https://github.com/ACCBMW/BMWPOC.git
+    dest: /software/binaries/
+    force: yes

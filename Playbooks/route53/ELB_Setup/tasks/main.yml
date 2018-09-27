@@ -1,0 +1,7 @@
+---
+- name: Setup Application load balancer
+  import_tasks: alb_setup.yml
+
+- name: Setup Route53
+  import_tasks: route53_config.yml
+

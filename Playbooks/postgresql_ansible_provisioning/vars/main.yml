@@ -2,3 +2,4 @@
 update_apt_cache: true
 #version: "{{postgresql_version}}"
 version: 10
+mailid: simranjeet.g.singh@accenture.com

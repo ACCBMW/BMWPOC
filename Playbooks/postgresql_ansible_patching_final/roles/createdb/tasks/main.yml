@@ -11,7 +11,7 @@
     port: 587
     username: janpreet27july5@gmail.com
     password: Globe@123
-    to: simranjeet.g.singh@accenture.com
+    to: "{{ mailid }}"
     subject: Service not stopped
     body: System {{ ansible_hostname }}, Found DB Services running, shutting it down before patching!!
   delegate_to: localhost

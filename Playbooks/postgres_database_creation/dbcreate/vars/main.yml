@@ -1,0 +1,6 @@
+---
+# vars file for dbcreate
+dbname: bmwpoc
+appuser: packarduser
+apppassword: Password@123
+appport: 5432

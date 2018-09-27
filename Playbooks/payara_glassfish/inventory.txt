@@ -1,0 +1,6 @@
+[targets]
+35.172.100.215
+34.204.186.116
+[targets:vars]
+ansible_user=ansible
+ansible_connection=ssh
