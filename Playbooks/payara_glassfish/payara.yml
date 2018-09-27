@@ -1,7 +1,0 @@
-### This playbook requires extra variable "payarahome" to be passed for the glassfish intallation directory
-- name: Install Payara Server
-  hosts: all
-#  ansible_user: ansible
-  become: yes
-  roles:
-  - Install_Payara
